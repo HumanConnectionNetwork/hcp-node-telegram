@@ -1,221 +1,202 @@
-# Contributing to HCP Node
+# Human Connection Protocol (HCP)
 
-First of all, thank you for your interest in contributing to HCP Node.
+# Code of Conduct
 
-Whether you are a software developer, designer, humanitarian worker, translator, researcher, data scientist, emergency responder, or volunteer, your contribution is valuable.
+## Our Commitment
 
-Human Connection Protocol (HCP) is an open initiative whose mission is to improve humanitarian coordination through open standards and interoperable technology.
+The Human Connection Protocol (HCP) is more than an open-source software project.
 
-Our goal is simple:
+It is an open humanitarian initiative whose purpose is to improve cooperation between people, organizations, and communities during emergencies.
 
-> **Build technology that helps people help people.**
+Every contributor, regardless of background, experience, nationality, language, or profession, deserves to participate in a respectful, inclusive, and collaborative environment.
 
----
-
-# Before You Start
-
-Please read the project documentation before contributing.
-
-Become familiar with:
-
-* Project Vision
-* Human Connection Protocol (HCP)
-* Repository Structure
-* Coding Standards
-* Humanitarian Principles
-
-Understanding the mission is as important as understanding the code.
+We believe that technology should strengthen human dignity.
 
 ---
 
-# Ways to Contribute
+# Our Values
 
-There are many ways to help.
+Every decision within this community should be guided by the following principles:
 
-## Software Development
+## Humanity
 
-* New features
-* Bug fixes
-* Performance improvements
-* Security improvements
-* API development
-* Database optimization
-* Telegram Bot improvements
+People always come before technology.
+
+The ultimate purpose of this project is to help human beings.
 
 ---
 
-## Documentation
+## Respect
 
-Improve:
+Treat everyone with kindness, patience, and professionalism.
 
-* README
-* Protocol specification
-* API documentation
-* Tutorials
-* Examples
-
-Clear documentation saves lives during emergencies.
+Respect different cultures, experiences, perspectives, and opinions.
 
 ---
 
-## Humanitarian Expertise
+## Collaboration
 
-We welcome contributions from people with experience in:
+Great humanitarian infrastructure cannot be built alone.
 
-* Disaster response
-* Humanitarian logistics
-* Missing persons coordination
-* Medical response
-* Civil protection
-* NGOs
-* Emergency communications
+We value cooperation over competition.
 
-Technology should learn from humanitarian practice.
+Knowledge grows when it is shared.
 
 ---
 
-## Design
+## Transparency
 
-Help improve:
+Be honest.
 
-* User experience
-* Accessibility
-* Icons
-* Interfaces
-* User flows
+Explain your ideas clearly.
 
-People under stress need interfaces that are simple and intuitive.
+Accept mistakes.
+
+Share information openly whenever possible.
 
 ---
 
-## Translation
+## Responsibility
 
-The protocol is intended to become international.
+Every contribution may eventually become part of systems used during humanitarian emergencies.
 
-Translations are welcome.
-
-Suggested priority languages:
-
-* English
-* Spanish
-* Portuguese
-* French
-* Arabic
+Code quality, documentation, and accuracy matter.
 
 ---
 
-# Development Workflow
+## Privacy
 
-1. Fork the repository.
-2. Create a feature branch.
-3. Commit your changes.
-4. Write clear commit messages.
-5. Submit a Pull Request.
+Respect the privacy of individuals.
 
-Example:
+Never expose sensitive personal information.
 
-```text
-git checkout -b feature/improve-search
-```
+Protect vulnerable populations.
 
 ---
 
-# Coding Guidelines
+## Neutrality
 
-We value:
+HCP is an open humanitarian protocol.
 
-* Readability over cleverness.
-* Simplicity over complexity.
-* Security by default.
-* Well documented code.
-* Modular architecture.
-* Testable components.
+Contributors are welcome regardless of nationality, religion, ethnicity, political opinion, or organizational affiliation.
 
-Code should be understandable by someone reading it years later during an emergency.
+The protocol itself does not promote political or ideological agendas.
 
 ---
 
-# Pull Requests
+## Inclusion
 
-Before opening a Pull Request, please verify:
+Everyone is welcome.
 
-* Code builds successfully.
-* No unnecessary dependencies were added.
-* Documentation is updated.
-* Existing functionality remains compatible.
-* Changes follow the project's architecture.
+We encourage participation from:
 
----
+* Developers
+* Humanitarian organizations
+* Researchers
+* Emergency responders
+* Volunteers
+* Students
+* Designers
+* Translators
 
-# Reporting Issues
-
-When reporting bugs, please include:
-
-* Operating system
-* Python version
-* Steps to reproduce
-* Expected behavior
-* Actual behavior
-* Logs (when available)
-
-The more information you provide, the faster the issue can be resolved.
+Different perspectives make the project stronger.
 
 ---
 
-# Humanitarian Principles
+# Expected Behavior
 
-All contributions should align with these principles:
-
-* Humanity
-* Neutrality
-* Impartiality
-* Independence
-* Transparency
-* Accountability
-* Privacy
-* Respect for human dignity
-
-Technology exists to serve people, not the other way around.
-
----
-
-# Community Expectations
-
-We expect contributors to:
+Contributors are expected to:
 
 * Be respectful.
-* Be collaborative.
-* Assume good intentions.
-* Welcome newcomers.
+* Be constructive.
+* Help newcomers.
 * Share knowledge.
-* Focus on solving problems.
-
-Healthy communities build resilient infrastructure.
-
----
-
-# Long-Term Vision
-
-HCP Node is part of a broader ecosystem that includes:
-
-* Human Connection Protocol (HCP)
-* Independent HCP Nodes
-* Humanitarian organizations
-* Government agencies
-* Volunteers
-* Academic institutions
-* Open-source communities
-
-Together, these components aim to create a global humanitarian infrastructure based on open standards and collaboration.
+* Accept feedback professionally.
+* Focus discussions on improving the project.
+* Assume good intentions.
+* Encourage collaboration.
 
 ---
 
-# Recognition
+# Unacceptable Behavior
 
-Every meaningful contribution matters.
+The following behaviors are not acceptable:
 
-Whether you improve a single line of documentation or implement a major feature, you are helping build infrastructure that may support humanitarian response during future emergencies.
+* Harassment.
+* Personal attacks.
+* Hate speech.
+* Discrimination.
+* Threats.
+* Intimidation.
+* Deliberate misinformation.
+* Publishing private information without permission.
+* Disruptive or hostile behavior.
+* Spam.
 
-Thank you for contributing.
+---
 
-Together, we are building technology that connects humanity.
+# Technical Discussions
+
+Disagreements are natural.
+
+Discuss ideas, not people.
+
+Support arguments with technical reasoning, evidence, and respect.
+
+The best ideas should win—not the loudest voices.
+
+---
+
+# Humanitarian Responsibility
+
+Because this project may support real humanitarian operations, contributors should carefully consider the potential impact of their work.
+
+Whenever possible:
+
+* Prioritize reliability.
+* Prioritize accessibility.
+* Prioritize interoperability.
+* Prioritize security.
+* Prioritize simplicity.
+
+Technology should reduce suffering, not increase complexity.
+
+---
+
+# Enforcement
+
+Project maintainers are responsible for promoting and enforcing this Code of Conduct.
+
+When behavior conflicts with these principles, maintainers may:
+
+* Request changes in behavior.
+* Remove inappropriate content.
+* Reject contributions.
+* Temporarily restrict participation.
+* Permanently remove contributors from project spaces when necessary.
+
+Actions should always be proportional, transparent, and focused on protecting the community.
+
+---
+
+# Our Philosophy
+
+The Human Connection Protocol is based on a simple belief:
+
+Technology is most valuable when it helps people connect, cooperate, and care for one another.
+
+Every line of code should move us closer to that goal.
+
+---
+
+# A Shared Mission
+
+By participating in this project, you agree to contribute in a way that strengthens trust, collaboration, and respect.
+
+Together we are building more than software.
+
+We are building open humanitarian infrastructure for the world.
+
+---
+
+> **Connecting Humanity Through Open Humanitarian Infrastructure.**
