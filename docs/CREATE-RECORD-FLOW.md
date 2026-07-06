@@ -1,10 +1,10 @@
 # CREATE-RECORD-FLOW
 
-Version: 0.1 (Draft)
+Version: 0.2 (Draft)
 
 Status: Draft
 
-Category: Client Specification
+Category: Client UX Specification
 
 Project: Human Connection Network
 
@@ -14,150 +14,152 @@ License: Apache-2.0
 
 Depends On:
 
-* HCP-0000 Overview
-* HCP-0001 Humanitarian Record
-* HCP Client Role
-* BOT-FLOW
+- HCP Client Role
+- BOT-FLOW
+- CLIENT-ARCHITECTURE
+- Humanitarian Record (HCP-0001)
 
 ---
 
 # 1. Purpose
 
-This document defines the complete conversational flow used by the HCP Telegram Client to create a Humanitarian Record.
+This document defines the complete user experience for creating a Humanitarian Record using the HCP Telegram Client.
 
-The objective is to ensure that every client implementing HCP collects information in a consistent, structured and user-friendly manner.
+The objective is to guide users through a simple, structured and accessible conversation while maximizing data quality and minimizing unnecessary free text.
 
-The conversation should feel natural while producing a valid Humanitarian Record.
+The client should behave as a humanitarian assistant rather than a traditional form.
 
 ---
 
 # 2. Design Principles
 
-The record creation process should follow these principles.
+The Create Report flow follows these principles.
 
-## One Question at a Time
+## Progressive
 
-The client should ask only one question per screen.
+Only one question is presented at a time.
+
+Users should never feel overwhelmed.
 
 ---
 
-## Minimum Necessary Information
+## Guided
 
-Only information useful for humanitarian correlation should be requested.
+Whenever possible, predefined options should be presented using buttons.
 
-Avoid collecting unnecessary personal information.
+Free text should only be requested when necessary.
 
 ---
 
 ## Accessible
 
-Questions should be understandable by anyone regardless of education level.
-
-Every message should include descriptive text and may be complemented with icons.
+Questions should be short, clear and understandable for users with different educational backgrounds.
 
 ---
 
-## Optional Information
+## Human-centered
 
-If the user does not know an answer, the client should allow the field to remain empty whenever possible.
+The conversation should feel natural and respectful.
 
-The goal is to record observations, not perfect information.
+The client assists the user instead of interrogating them.
 
 ---
 
-# 3. Conversation Flow
+## Honest Data
+
+The system encourages honest reporting.
+
+Approximate information is acceptable when exact information is unavailable.
+
+---
+
+# 3. Flow Overview
 
 ```text
-Create Report
+/start
 
 ↓
 
-Reported Name
+📝 Crear Reporte
 
 ↓
 
-Estimated Age
+¿Qué deseas reportar?
 
 ↓
 
-Reported Location
+🚨 Persona desaparecida
+🏥 Persona hospitalizada
+🏠 Persona refugiada / en albergue
+✅ Persona localizada / segura
+🚑 Emergencia pública
 
 ↓
 
-Event Type
+Formulario correspondiente
 
 ↓
 
-Current Status
+Resumen
 
 ↓
 
-Information Source
+Confirmar
 
 ↓
 
-Short Description
+Enviar al Nodo HCP
 
 ↓
 
-Review
-
-↓
-
-Confirm
-
-↓
-
-Create Humanitarian Record
-
-↓
-
-POST /hcp/records
-
-↓
-
-Success
+Respuesta del Nodo
 ```
 
 ---
 
-# 4. Step 1
+# 4. Event Selection
 
-## 👤 Reported Name
+The first decision determines the type of Humanitarian Observation.
 
-Question
+The user selects one option.
 
-"What name was reported?"
+- 🚨 Missing Person
+- 🏥 Hospitalized Person
+- 🏠 Sheltered Person
+- ✅ Safe / Located Person
+- 🚑 Public Emergency
 
-Examples
+Internally this becomes:
 
-Maria Perez
+```text
+missing
+hospitalized
+sheltered
+safe
+public_emergency
+```
 
-Carlos Rodriguez
-
-Unknown
-
-Validation
-
-This field is recommended.
-
-If the name is unknown, the client should allow "Unknown".
+These values populate the `event_type` field of the Humanitarian Record.
 
 ---
 
-# 5. Step 2
+# 5. Missing Person Flow
 
-## 🎂 Estimated Age
+The following conversation is used.
 
-Question
+---
 
-"What is the estimated age?"
+## Step 1
+
+🎂
+
+**What is the estimated age of the person?**
 
 Examples
 
 34
 
-Around 30
+Around 50
 
 Child
 
@@ -165,274 +167,282 @@ Adult
 
 Unknown
 
-Validation
+---
 
-Exact age is not required.
+## Step 2
 
-Approximate values are acceptable.
+👤
+
+**Do you know the person's name?**
+
+If you know it, write the reported name.
+
+If you don't know it, write:
+
+Unknown
 
 ---
 
-# 6. Step 3
+## Step 3
 
-## 📍 Reported Location
+📍
 
-Question
-
-"Where was this person reported?"
+**Where is the person located?**
 
 Examples
 
-Caracas
+City
 
-Maracaibo
+Neighborhood
 
 Hospital
 
 Shelter
 
-School
-
-Neighborhood
-
-If the exact place is unknown, a general location is acceptable.
+Reference point
 
 ---
 
-# 7. Step 4
+## Step 4
 
-## 🚨 Event Type
+📣
 
-The client should offer predefined options.
+**Who is reporting this event?**
 
-Examples
+The user selects one option.
 
-Missing
+👨‍👩‍👧 Family
 
-Hospitalized
+🏥 Hospital
 
-Sheltered
+🚒 Fire Department
 
-Evacuated
+🤝 Volunteer
 
-Injured
+👮 Police
 
-Safe
+👤 Friend / Acquaintance
 
-Deceased
+❓ Unknown
 
-Other
-
-The user may select "Other" when necessary.
+No free text is allowed in this step.
 
 ---
 
-# 8. Step 5
+## Step 5
 
-## 📌 Current Status
+📝
 
-Examples
+Describe the situation briefly.
 
-Reported
-
-Confirmed
-
-Updated
-
-Closed
-
-This field describes the status of the humanitarian observation, not the person's identity.
+Only useful humanitarian information should be included.
 
 ---
 
-# 9. Step 6
+# 6. Other Event Types
 
-## 🏥 Information Source
+Hospitalized Person
 
-Examples
+Sheltered Person
 
-Family
+Safe Person
 
-Volunteer
+Public Emergency
 
-Hospital
+follow the same conversational model whenever possible.
 
-Fire Department
-
-Police
-
-NGO
-
-Government
-
-Other
-
-The information source contributes to later probability calculations performed by the HCP Node.
-
-The Telegram Client simply records the reported source.
+Future versions may introduce event-specific questions while preserving protocol compatibility.
 
 ---
 
-# 10. Step 7
+# 7. Temporary Draft
 
-## 📝 Short Description
+During the conversation no Humanitarian Record is created.
 
-Question
-
-"Please provide a short description."
+Each answer is temporarily stored in the user session.
 
 Example
 
-Reported by relatives after the landslide.
+```text
+context.user_data
+```
 
-Seen entering the local hospital.
-
-Last reported near the evacuation center.
-
-Descriptions should remain factual and concise.
+If the user cancels the conversation all temporary information is discarded.
 
 ---
 
-# 11. Review Screen
+# 8. Review Screen
 
-Before submission the client should display a complete summary.
+After all required information has been collected, the client displays a review page.
+
+---
+
+📋 **Review your report before sending**
+
+You have completed the available information for this report.
+
+This record will become part of an open humanitarian service whose purpose is to help relate information during emergency situations.
+
+Please submit only information that you believe to be true or reasonably reliable.
+
+An honest report may help connect important information for other people.
+
+Would you like to send this report?
+
+---
+
+The collected information is displayed in a user-friendly format.
+
+Internal protocol identifiers must never be shown.
 
 Example
 
-Reported Name
+Instead of
 
-Maria Perez
+```text
+event_type = missing
+```
 
-Estimated Age
+Display
 
-34
+```text
+🚨 Missing Person
+```
 
-Location
+---
 
-Caracas
+# 9. Available Actions
 
-Event Type
+Three buttons are displayed.
 
-Hospitalized
+✅ Confirm and Send
 
-Status
-
-Reported
-
-Source
-
-Hospital
-
-Description
-
-Reported after the landslide.
-
-Buttons
-
-✅ Confirm
-
-✏ Edit
+✏️ Edit Information
 
 ❌ Cancel
 
-The record should not be submitted before confirmation.
+---
+
+# 10. Edit Information
+
+Selecting Edit allows the user to modify individual fields.
+
+Examples
+
+🎂 Estimated Age
+
+👤 Reported Name
+
+📍 Location
+
+📣 Reporter
+
+📝 Description
+
+After editing, the client returns to the Review Screen.
 
 ---
 
-# 12. Record Creation
+# 11. Cancel
 
-After confirmation
+If the user cancels,
 
-The Telegram Client creates a valid Humanitarian Record according to the HCP Specification.
-
-The client does not decide how the record will be stored.
-
-Its responsibility ends after successfully submitting the JSON to the configured HCP Node.
-
----
-
-# 13. Successful Submission
-
-If the HCP Node accepts the record
+all temporary information is deleted.
 
 The client displays
 
-✅ Humanitarian Report submitted successfully.
+---
 
-Reference ID
+Report cancelled.
 
-xxxxxxxx
+No information has been sent.
 
-This identifier allows future reference to the submitted report.
+You may create a new report at any time from the main menu.
 
 ---
 
-# 14. Error Handling
+# 12. Confirmation
 
-If communication fails
+Only after the user selects
 
-The client should explain the problem using clear language.
+✅ Confirm and Send
 
-Examples
+does the client create a Humanitarian Record.
 
-Unable to contact the HCP Node.
+The object is validated.
 
-Please try again later.
+Converted to HCP JSON.
 
-The information you entered has not been lost.
-
-Avoid technical error messages whenever possible.
+Sent to the configured HCP Node.
 
 ---
 
-# 15. Data Validation
+# 13. Successful Response
 
-The Telegram Client performs only basic validation.
-
-Examples
-
-* Empty required fields
-* Invalid age format
-* Excessively long descriptions
-* Unsupported characters
-
-Semantic validation belongs to the HCP Node.
+If the Node accepts the record the client displays
 
 ---
 
-# 16. Privacy
+✅ Report successfully submitted
 
-The Telegram Client should remind users that:
+Thank you for contributing.
 
-The information provided will become part of a humanitarian record.
+Your report has been registered as a Humanitarian Observation.
 
-Only information necessary for humanitarian assistance should be reported.
+HCP does not attempt to identify people.
 
-Sensitive personal information unrelated to the event should not be included.
+HCP relates humanitarian observations submitted by families, hospitals, emergency organizations and volunteers in order to facilitate future searches and possible correlations.
 
----
-
-# 17. Future Compatibility
-
-This conversational flow should remain compatible with future HCP clients including:
-
-* Telegram
-* WhatsApp
-* SMS
-* Mobile Applications
-* Web Clients
-* Offline-first implementations
-* Mesh Network Clients
-
-Only the communication channel should change.
-
-The Humanitarian Record should remain identical.
+As additional compatible observations are received, this report may contribute to new humanitarian correlations.
 
 ---
 
-# 18. Summary
+📄 HCP Record
 
-The Create Record flow transforms a simple conversation into a standardized Humanitarian Record.
+Record ID
 
-By asking one clear question at a time, validating only essential information and confirming the final summary before submission, the Telegram Client enables anyone to contribute structured humanitarian observations while remaining faithful to the principles of the Humanitarian Connection Protocol.
+Date
 
+Status
+
+🟢 Successfully Registered
+
+---
+
+The user is also informed
+
+You may share this Record ID with relatives, humanitarian organizations or search teams whenever you need to reference this report.
+
+---
+
+# 14. Failed Submission
+
+If the HCP Node cannot be reached
+
+the client informs the user that the report could not be delivered.
+
+Future versions may allow automatic retry or offline synchronization.
+
+---
+
+# 15. Design Philosophy
+
+Creating a Humanitarian Record is not the same as identifying a person.
+
+The report represents a humanitarian observation recorded at a particular place and time using the information available to the reporter.
+
+Multiple observations may refer to the same person without claiming certainty.
+
+HCP preserves each observation independently and enables future correlation between compatible reports.
+
+This approach maximizes interoperability while avoiding assumptions about identity.
+
+---
+
+# 16. Summary
+
+The Create Report flow guides users through a structured humanitarian conversation that prioritizes accessibility, data quality and protocol consistency.
+
+The user provides only the information available, reviews the complete report before submission and explicitly confirms its publication.
+
+The resulting Humanitarian Record becomes a reusable humanitarian observation that may later be correlated with other compatible observations across the HCP ecosystem.
