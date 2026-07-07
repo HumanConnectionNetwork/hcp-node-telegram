@@ -34,7 +34,10 @@ def main() -> None:
     application.add_handler(CommandHandler("start", start))
 
     application.add_handler(
-        CallbackQueryHandler(start, pattern="^(cancel|back_to_start)$")
+        CallbackQueryHandler(
+            start,
+            pattern="^(cancel|back_to_start|review_cancel)$",
+        )
     )
 
     application.add_handler(
