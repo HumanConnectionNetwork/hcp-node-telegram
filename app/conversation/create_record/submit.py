@@ -17,16 +17,17 @@ async def submit_record(
     await query.answer()
 
     record = HumanitarianRecord(
-        reported_name=context.user_data.get("reported_name", "Desconocido"),
-        estimated_age=context.user_data.get("estimated_age", "Desconocido"),
-        reported_location=context.user_data.get("reported_location", "Desconocido"),
+        subject_type=context.user_data.get("subject_type", "human"),
         event_type=context.user_data.get("event_type", "unknown"),
-        status="reported",
+        reported_name=context.user_data.get("reported_name", "Desconocido"),
+        estimated_age=int(context.user_data.get("estimated_age", 0)),
+        reported_location=context.user_data.get("reported_location", "Desconocido"),
         source=context.user_data.get("source", "unknown"),
         description=context.user_data.get("description", ""),
+        status="reported",
     )
 
-    payload = record.to_json()
+    payload = record.to_dict()
 
     print("HCP Record payload:")
     print(payload)
@@ -42,11 +43,11 @@ async def submit_record(
             "HCP relaciona observaciones humanitarias para facilitar búsquedas, "
             "verificación y posibles coincidencias durante una emergencia.\n\n"
             "📄 Registro HCP\n\n"
-            f"ID:\n{record.record_id}\n\n"
-            f"Fecha:\n{record.created_at}\n\n"
-            "Estado:\n🟢 Preparado correctamente\n\n"
-            "Puedes compartir este identificador con familiares, organizaciones "
-            "o equipos de búsqueda cuando necesites hacer referencia a este reporte."
+            "ID:\n"
+            "Pendiente de Nodo HCP\n\n"
+            "Estado:\n"
+            "🟢 Preparado correctamente\n\n"
+            "Puedes compartir este reporte cuando sea registrado en un Nodo HCP."
         )
     )
 
