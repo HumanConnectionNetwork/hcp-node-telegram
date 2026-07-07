@@ -25,13 +25,9 @@ async def ask_estimated_age(
     await query.edit_message_text(
         text=(
             "🎂 ¿Cuál es la edad estimada de la persona?\n\n"
-            "Puedes escribir un número o una aproximación.\n\n"
-            "Ejemplos:\n"
-            "34\n"
-            "Alrededor de 50\n"
-            "Niño\n"
-            "Adulto\n"
-            "Desconocido"
+            "Escribe solo números.\n\n"
+            "Ejemplo:\n"
+            "45"
         )
     )
 
@@ -94,11 +90,14 @@ async def handle_record_text(
     text = update.message.text.strip()
     step = context.user_data.get("record_step")
 
-    #
-    # Edad estimada
-    #
-
     if step == states.ESTIMATED_AGE:
+        if not text.isdigit():
+            await update.message.reply_text(
+                "⚠️ La edad debe ser un número.\n\n"
+                "Ejemplo:\n"
+                "45"
+            )
+            return
 
         context.user_data["estimated_age"] = text
         context.user_data["record_step"] = states.REPORTED_NAME
@@ -109,15 +108,9 @@ async def handle_record_text(
             "Si no lo sabes, escribe:\n"
             "Desconocido"
         )
-
         return
 
-    #
-    # Nombre reportado
-    #
-
     if step == states.REPORTED_NAME:
-
         context.user_data["reported_name"] = text
         context.user_data["record_step"] = states.REPORTED_LOCATION
 
@@ -130,31 +123,18 @@ async def handle_record_text(
             "• Refugio\n"
             "• Punto de referencia"
         )
-
         return
 
-    #
-    # Localización
-    #
-
     if step == states.REPORTED_LOCATION:
-
         context.user_data["reported_location"] = text
         context.user_data["record_step"] = states.SOURCE
 
         await ask_reporter_source(update, context)
-
         return
 
-    #
-    # Descripción
-    #
-
     if step == states.DESCRIPTION:
-
         context.user_data["description"] = text
         context.user_data["record_step"] = states.REVIEW
 
         await review_record(update, context)
-
         return
