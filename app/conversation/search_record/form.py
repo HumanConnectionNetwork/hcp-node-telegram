@@ -25,13 +25,9 @@ async def ask_search_estimated_age(
     await query.edit_message_text(
         text=(
             "🎂 ¿Qué edad aproximada tiene la persona que buscas?\n\n"
-            "Puedes escribir un número o una aproximación.\n\n"
-            "Ejemplos:\n"
-            "34\n"
-            "Alrededor de 50\n"
-            "Niño\n"
-            "Adulto\n"
-            "Desconocido"
+            "Escribe solo números.\n\n"
+            "Ejemplo:\n"
+            "45"
         )
     )
 
@@ -47,6 +43,14 @@ async def handle_search_text(
     step = context.user_data.get("search_step")
 
     if step == states.ESTIMATED_AGE:
+        if not text.isdigit():
+            await update.message.reply_text(
+                "⚠️ La edad debe ser un número.\n\n"
+                "Ejemplo:\n"
+                "45"
+            )
+            return
+
         context.user_data["search_estimated_age"] = text
         context.user_data["search_step"] = states.REPORTED_NAME
 
