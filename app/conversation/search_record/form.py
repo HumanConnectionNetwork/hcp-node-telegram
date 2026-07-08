@@ -42,8 +42,8 @@ async def handle_search_text(
     step = context.user_data.get("search_step")
 
     if step == states.ESTIMATED_AGE:
-    context.user_data["search_estimated_age"] = text
-    context.user_data["search_step"] = states.REPORTED_LOCATION
+        context.user_data["search_estimated_age"] = text
+        context.user_data["search_step"] = states.REPORTED_LOCATION
 
     await update.message.reply_text(
         "📍 ¿Dónde fue vista por última vez o dónde fue reportada?\n\n"
@@ -53,17 +53,6 @@ async def handle_search_text(
     )
     return
 
-        context.user_data["search_estimated_age"] = text
-        context.user_data["search_step"] = states.REPORTED_NAME
-
-        text=(
-        "👤 ¿Conoces el nombre reportado?\n\n"
-        "Si lo conoces, escríbelo.\n\n"
-        "Si no lo conoces, escribe:\n"
-        "Desconocido"
-    )
-)
-        return
 
     if step == states.REPORTED_NAME:
     context.user_data["search_reported_name"] = text
