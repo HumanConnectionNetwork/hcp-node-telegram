@@ -3,8 +3,8 @@
   "start.welcome_message": "Bienvenido. Este servicio permite registrar y consultar observaciones humanitarias utilizando el Humanitarian Connection Protocol (HCP).",
   "start.main_menu_question": "¿Qué deseas hacer?",
 
-  "menu.create_report": "📝 Crear reporte",
-  "menu.search_report": "🔍 Buscar caso reportado",
+  "menu.create_report": "📝 Reportar persona o animal",
+"menu.search_report": "🔍 Buscar persona o animal",
   "menu.language": "🌐 Idioma",
   "menu.help": "❓ Ayuda",
 
