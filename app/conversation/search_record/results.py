@@ -12,7 +12,10 @@ MOCK_RESULTS = [
         "reported_location": "La Guaira",
         "status": "Reportado",
         "source": "👤 Amigo / Conocido",
-        "reason_summary": "Coinciden parcialmente el lugar y el contexto, pero el nombre y la edad no coinciden completamente.",
+        "reason_summary": (
+            "Coinciden parcialmente el lugar y el contexto, "
+            "pero el nombre y la edad no coinciden completamente."
+        ),
     },
     {
         "candidate_id": "candidate_2",
@@ -23,7 +26,10 @@ MOCK_RESULTS = [
         "reported_location": "Hospital en Caracas",
         "status": "Reportado",
         "source": "🏥 Hospital",
-        "reason_summary": "El nombre es parecido y la edad es compatible, pero la localización es diferente.",
+        "reason_summary": (
+            "El nombre es parecido y la edad es compatible, "
+            "pero la localización es diferente."
+        ),
     },
     {
         "candidate_id": "candidate_3",
@@ -34,12 +40,22 @@ MOCK_RESULTS = [
         "reported_location": "Centro de refugio",
         "status": "Reportado",
         "source": "🤝 Voluntario",
-        "reason_summary": "Existen pocos datos compatibles. Este resultado tiene baja probabilidad.",
+        "reason_summary": (
+            "Existen pocos datos compatibles. "
+            "Este resultado tiene baja probabilidad."
+        ),
     },
 ]
 
 
-def get_mock_results_for_query(search_name: str) -> list[dict]:
+def get_mock_results_for_query(search_data: dict) -> list[dict]:
+    """
+    Temporary mock correlation function.
+
+    Later this function should be replaced by a real call to an HCP node.
+    """
+
+    search_name = search_data.get("reported_name", "")
     normalized_name = search_name.strip().lower()
 
     if normalized_name in ["mario", "pedro", "jose", "josé", "carlos"]:
@@ -53,58 +69,125 @@ def get_mock_results_for_query(search_name: str) -> list[dict]:
                 "reported_location": "La Guaira",
                 "status": "Reportado",
                 "source": "👤 Amigo / Conocido",
-                "reason_summary": "El nombre no coincide. Solo existen similitudes generales de contexto.",
+                "reason_summary": (
+                    "El nombre no coincide. "
+                    "Solo existen similitudes generales de contexto."
+                ),
             }
         ]
 
-    return MOCK_RESULTS
+    return MOCK_RESULTS[:3]
 
 
-async def show_mock_search_results(
+def _format_unknown(value: object) -> str:
+    if value is None:
+        return "No especificado"
+
+    text = str(value).strip()
+
+    if not text:
+        return "No especificado"
+
+    if text == "0":
+        return "No especificado"
+
+    return text
+
+
+async def show_search_results(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
 ) -> None:
-    search_name = context.user_data.get("search_reported_name", "Desconocido")
-    search_age = context.user_data.get("search_estimated_age", "Desconocido")
-    search_location = context.user_data.get(
-        "search_reported_location",
-        "Desconocido",
-    )
-    search_recognition_features = context.user_data.get(
-        "search_recognition_features",
-        "No especificadas",
-    )
+    """
+    Shows possible related humanitarian cases.
 
-    results = get_mock_results_for_query(search_name)
+    HCP does not claim to identify a person or animal.
+    It shows correlation candidates based on compatible observations.
+    """
+
+    search_data = context.user_data.get("search_record", {})
+
+    search_name = _format_unknown(
+        search_data.get("reported_name") or search_data.get("animal_name")
+    )
+    search_age = _format_unknown(search_data.get("estimated_age"))
+    search_location = _format_unknown(search_data.get("location"))
+    search_features = _format_unknown(search_data.get("recognition_features"))
+    search_category = search_data.get("category", "person")
+
+    results = get_mock_results_for_query(search_data)
 
     message = (
-        "🔍 Resultados de búsqueda\n\n"
-        "HCP no identifica personas.\n"
-        "Relaciona observaciones humanitarias que podrían corresponder a un mismo caso.\n\n"
+        "🔍 Posibles casos relacionados\n\n"
+        "HCP no identifica personas ni animales por identidad.\n"
+        "Relaciona observaciones humanitarias que podrían corresponder "
+        "a un mismo caso.\n\n"
         "Datos consultados:\n"
-        f"👤 Nombre: {search_name}\n"
-        f"🎂 Edad aproximada: {search_age}\n"
-        f"📍 Localización: {search_location}\n"
-        f"🆔 Características: {search_recognition_features}\n\n"
     )
 
+    if search_category == "animal":
+        species = _format_unknown(search_data.get("species"))
+        size = _format_unknown(search_data.get("size"))
+        breed_or_type = _format_unknown(search_data.get("breed_or_type"))
+
+        message += (
+            f"🐾 Animal: {species}\n"
+            f"🏷️ Nombre: {search_name}\n"
+            f"📏 Tamaño: {size}\n"
+            f"🧬 Raza / tipo: {breed_or_type}\n"
+            f"📍 Ubicación: {search_location}\n"
+            f"🧩 Características: {search_features}\n\n"
+        )
+    else:
+        message += (
+            f"👤 Nombre: {search_name}\n"
+            f"🎂 Edad aproximada: {search_age}\n"
+            f"📍 Ubicación: {search_location}\n"
+            f"🧩 Características: {search_features}\n\n"
+        )
+
     if not results:
+        keyboard = [
+            [
+                InlineKeyboardButton(
+                    "🔍 Nueva búsqueda",
+                    callback_data="search_menu",
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    "⬅️ Volver al menú principal",
+                    callback_data="back_to_start",
+                )
+            ],
+        ]
+
         await update.message.reply_text(
             message
-            + "No se encontraron observaciones compatibles con los datos ingresados."
+            + (
+                "No se encontraron posibles casos relacionados con la "
+                "información proporcionada.\n\n"
+                "Puedes intentar nuevamente agregando o modificando datos como:\n\n"
+                "• ubicación\n"
+                "• edad aproximada\n"
+                "• características para identificación\n\n"
+                "Las correlaciones mejoran cuando existen más observaciones compatibles."
+            ),
+            reply_markup=InlineKeyboardMarkup(keyboard),
         )
         return
 
     strong_results = [result for result in results if result["probability"] >= 60]
 
-    if not strong_results:
+    if strong_results:
+        message += "Se encontraron posibles casos relacionados:\n\n"
+    else:
         message += (
             "No se encontraron coincidencias fuertes.\n\n"
-            "Sin embargo, existen algunos reportes con características parcialmente similares. "
-            "Pueden ser útiles para verificación humanitaria, pero no deben interpretarse como coincidencias probables.\n\n"
+            "Sin embargo, existen algunos reportes con características "
+            "parcialmente similares. Pueden ser útiles para verificación "
+            "humanitaria, pero no deben interpretarse como coincidencias probables.\n\n"
         )
-    else:
-        message += "Se encontraron posibles casos relacionados:\n\n"
 
     keyboard = []
 
@@ -116,20 +199,28 @@ async def show_mock_search_results(
             f"Tipo: {result['event_type']}\n"
             f"Nombre reportado: {result['reported_name']}\n"
             f"Edad estimada: {result['estimated_age']}\n"
-            f"Localización: {result['reported_location']}\n"
+            f"Ubicación: {result['reported_location']}\n"
             f"Estado: {result['status']}\n"
             f"Fuente: {result['source']}\n\n"
-            f"¿Por qué este resultado?\n{result['reason_summary']}\n\n"
         )
 
         keyboard.append(
             [
                 InlineKeyboardButton(
-                    f"Ver explicación #{index}",
+                    f"ℹ️ ¿Por qué este resultado? #{index}",
                     callback_data=f"explain_{result['candidate_id']}",
                 )
             ]
         )
+
+    keyboard.append(
+        [
+            InlineKeyboardButton(
+                "🔍 Nueva búsqueda",
+                callback_data="search_menu",
+            )
+        ]
+    )
 
     keyboard.append(
         [
