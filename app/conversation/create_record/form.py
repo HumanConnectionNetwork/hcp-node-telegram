@@ -226,56 +226,52 @@ async def handle_reporter_source(update: Update, context: ContextTypes.DEFAULT_T
 
     subject_type = context.user_data.get("subject_type", "human")
 
-if subject_type == "animal":
+    if subject_type == "animal":
+        description = (
+            "Describe cualquier característica visible que facilite "
+            "reconocer al animal.\n\n"
+        )
 
-    description = (
-        "Describe cualquier característica visible que facilite "
-        "reconocer al animal.\n\n"
-    )
+        examples = (
+            "Puedes incluir información como:\n\n"
+            "🎨 Color del pelaje\n"
+            "⚪ Manchas\n"
+            "🦺 Collar o arnés\n"
+            "🏷️ Placa identificadora\n"
+            "🩹 Cicatrices\n"
+            "🐾 Forma de caminar\n"
+            "👁️ Color de los ojos"
+        )
+    else:
+        description = (
+            "Describe cualquier característica visible que facilite "
+            "reconocer a la persona.\n\n"
+        )
 
-    examples = (
-        "Puedes incluir información como:\n\n"
-        "🎨 Color del pelaje\n"
-        "⚪ Manchas\n"
-        "🦺 Collar o arnés\n"
-        "🏷️ Placa identificadora\n"
-        "🩹 Cicatrices\n"
-        "🐾 Forma de caminar\n"
-        "👁️ Color de los ojos"
-    )
-
-else:
-
-    description = (
-        "Describe cualquier característica visible que facilite "
-        "reconocer a la persona.\n\n"
-    )
-
-    examples = (
-        "Puedes incluir información como:\n\n"
-        "👕 Vestimenta\n"
-        "🎨 Colores\n"
-        "👓 Lentes\n"
-        "🎒 Mochila\n"
-        "🖋️ Tatuajes\n"
-        "🩹 Cicatrices\n"
-        "💇 Cabello"
-    )
+        examples = (
+            "Puedes incluir información como:\n\n"
+            "👕 Vestimenta\n"
+            "🎨 Colores\n"
+            "👓 Lentes\n"
+            "🎒 Mochila\n"
+            "🖋️ Tatuajes\n"
+            "🩹 Cicatrices\n"
+            "💇 Cabello"
+        )
 
     await query.edit_message_text(
         text=(
-    "🧩 Características para identificación\n\n"
-    f"{description}"
-    f"{examples}\n\n"
-    "☎️ CONTACTO PÚBLICO (opcional)\n"
-    "Si corresponde, puedes incluir un medio de contacto público "
-    "proporcionado por quien reporta el caso, por ejemplo un número de teléfono.\n\n"
-    "Este contacto forma parte únicamente de esta observación y no será utilizado "
-    "como criterio de búsqueda o correlación.\n\n"
-    "Máximo 300 caracteres."
-)
+            "🧩 Características para identificación\n\n"
+            f"{description}"
+            f"{examples}\n\n"
+            "☎️ CONTACTO PÚBLICO (opcional)\n"
+            "Si corresponde, puedes incluir un medio de contacto público "
+            "proporcionado por quien reporta el caso, por ejemplo un número de teléfono.\n\n"
+            "Este contacto forma parte únicamente de esta observación y no será utilizado "
+            "como criterio de búsqueda o correlación.\n\n"
+            "Máximo 300 caracteres."
+        )
     )
-
 
 async def handle_record_text(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if await handle_edit_text(update, context):
