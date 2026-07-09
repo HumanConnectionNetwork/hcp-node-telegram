@@ -5,4 +5,4 @@ __pycache__/
 !.env.example
 .venv/
 venv/
-data/records.json
+data/hcp_records.json
