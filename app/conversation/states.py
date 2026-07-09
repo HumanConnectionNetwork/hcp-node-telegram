@@ -35,14 +35,20 @@ ANIMAL_BREED_TEXT = "animal_breed_text"
 
 SEARCH_TYPE = "search_type"
 
+# Person search
+
 SEARCH_REPORTED_NAME = "search_reported_name"
 SEARCH_ESTIMATED_AGE = "search_estimated_age"
 SEARCH_LOCATION = "search_location"
 SEARCH_SOURCE = "search_source"
 SEARCH_RECOGNITION_FEATURES = "search_recognition_features"
 
+# Animal search
+
 SEARCH_ANIMAL_SPECIES = "search_animal_species"
 SEARCH_ANIMAL_NAME = "search_animal_name"
+SEARCH_ANIMAL_SIZE = "search_animal_size"
+SEARCH_ANIMAL_BREED_TEXT = "search_animal_breed_text"
 SEARCH_ANIMAL_LOCATION = "search_animal_location"
 SEARCH_ANIMAL_FEATURES = "search_animal_features"
 
