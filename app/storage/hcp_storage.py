@@ -4,7 +4,7 @@ from typing import Any
 
 
 DATA_DIR = Path("data")
-RECORDS_FILE = DATA_DIR / "records.json"
+RECORDS_FILE = DATA_DIR / "hcp_records.json"
 
 
 def ensure_storage_exists() -> None:
