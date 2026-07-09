@@ -226,48 +226,54 @@ async def handle_reporter_source(update: Update, context: ContextTypes.DEFAULT_T
 
     subject_type = context.user_data.get("subject_type", "human")
 
-    if subject_type == "animal":
-        examples = (
-            "Ejemplos:\n"
-            "• 🦺 Collar rojo\n"
-            "• 🎨 Pelaje marrón\n"
-            "• ⚪ Mancha blanca en el pecho\n"
-            "• 🩹 Oreja izquierda cortada\n"
-            "• 🎒 Arnés azul\n"
-            "• 🐾 Cojea de una pata"
+if subject_type == "animal":
+
+    description = (
+        "Describe cualquier característica visible que facilite "
+        "reconocer al animal.\n\n"
     )
-   else:
-       examples = (
-            "Ejemplos:\n"
-            "• 👕 Camisa azul y pantalón negro\n"
-            "• 👗 Vestido rojo\n"
-            "• 🧥 Chaqueta negra\n"
-            "• 👓 Usa lentes\n"
-            "• 🖋️ Tatuaje en el brazo derecho\n"
-            "• 🩹 Cicatriz en la frente\n"
-            "• 🎒 Mochila gris\n"
-            "• 💇 Cabello largo y rizado"
+
+    examples = (
+        "Puedes incluir información como:\n\n"
+        "🎨 Color del pelaje\n"
+        "⚪ Manchas\n"
+        "🦺 Collar o arnés\n"
+        "🏷️ Placa identificadora\n"
+        "🩹 Cicatrices\n"
+        "🐾 Forma de caminar\n"
+        "👁️ Color de los ojos"
+    )
+
+else:
+
+    description = (
+        "Describe cualquier característica visible que facilite "
+        "reconocer a la persona.\n\n"
+    )
+
+    examples = (
+        "Puedes incluir información como:\n\n"
+        "👕 Vestimenta\n"
+        "🎨 Colores\n"
+        "👓 Lentes\n"
+        "🎒 Mochila\n"
+        "🖋️ Tatuajes\n"
+        "🩹 Cicatrices\n"
+        "💇 Cabello"
     )
 
     await query.edit_message_text(
         text=(
-            "🧩 Características para identificación\n\n"
-            "Describe la vestimenta o cualquier característica visible que facilite "
-            "reconocer a la persona o al animal.\n\n"
-            "👕 Vestimenta\n"
-            "🎨 Colores\n"
-            "👓 Lentes\n"
-            "🎒 Mochila\n"
-            "🦺 Collar\n"
-            "🩹 Cicatrices o señas particulares\n\n"
-            "☎️ CONTACTO PÚBLICO (opcional)\n"
-            "Si corresponde, también puedes incluir una forma pública de contacto "
-            "proporcionada por quien reporta el caso, por ejemplo un número de teléfono.\n\n"
-            "Este contacto forma parte únicamente de esta observación y no será utilizado "
-            "como criterio de búsqueda o correlación.\n\n"
-            f"{examples}\n\n"
-            "Máximo 300 caracteres."
-        )
+    "🧩 Características para identificación\n\n"
+    f"{description}"
+    f"{examples}\n\n"
+    "☎️ CONTACTO PÚBLICO (opcional)\n"
+    "Si corresponde, puedes incluir un medio de contacto público "
+    "proporcionado por quien reporta el caso, por ejemplo un número de teléfono.\n\n"
+    "Este contacto forma parte únicamente de esta observación y no será utilizado "
+    "como criterio de búsqueda o correlación.\n\n"
+    "Máximo 300 caracteres."
+)
     )
 
 
