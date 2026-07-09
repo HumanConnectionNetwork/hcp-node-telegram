@@ -34,14 +34,15 @@ async def ask_estimated_age(
         return
 
     context.user_data["record_step"] = states.REPORTED_NAME
+
     await query.edit_message_text(
-    text=(
-        "👤 ¿Sabes el nombre de la persona?\n\n"
-        "Si lo sabes, escribe el nombre reportado.\n\n"
-        "Si no lo sabes, escribe:\n"
-        "Desconocido"
+        text=(
+            "👤 ¿Sabes el nombre de la persona?\n\n"
+            "Si lo sabes, escribe el nombre reportado.\n\n"
+            "Si no lo sabes, escribe:\n"
+            "Desconocido"
+        )
     )
-)
 
 
 async def show_animal_species_options(
@@ -215,7 +216,6 @@ async def handle_reporter_source(
     await query.answer()
 
     source = query.data.replace("source_", "")
-
     context.user_data["source"] = source
     context.user_data["record_step"] = states.RECOGNITION_FEATURES
 
@@ -252,6 +252,8 @@ async def handle_reporter_source(
             "a la persona o al animal.\n\n"
             "Puedes mencionar ropa, colores, lentes, tatuajes, cicatrices, mochila, collar "
             "u otros detalles visibles.\n\n"
+            "Si corresponde, también puedes incluir una forma pública de contacto proporcionada "
+            "por quien reporta el caso, por ejemplo un número de teléfono.\n\n"
             f"{examples}\n\n"
             "Máximo 300 caracteres."
         )
@@ -291,6 +293,36 @@ async def handle_record_text(
         )
         return
 
+    if step == states.REPORTED_NAME:
+        if len(text) > MAX_NAME_LENGTH:
+            await update.message.reply_text(
+                "⚠️ El nombre debe tener máximo 80 caracteres.\n\n"
+                "Intenta escribir una versión más corta."
+            )
+            return
+
+        context.user_data["reported_name"] = text
+
+        if subject_type == "animal":
+            context.user_data["record_step"] = states.REPORTED_LOCATION
+
+            await update.message.reply_text(
+                "📍 ¿Dónde se encuentra o fue visto el animal?\n\n"
+                "Puedes escribir ciudad, barrio, refugio, clínica veterinaria o punto de referencia.\n\n"
+                "Máximo 120 caracteres."
+            )
+            return
+
+        context.user_data["record_step"] = states.ESTIMATED_AGE
+
+        await update.message.reply_text(
+            "🎂 ¿Cuál es la edad estimada de la persona?\n\n"
+            "Escribe solo números.\n\n"
+            "Ejemplo:\n"
+            "45"
+        )
+        return
+
     if step == states.ESTIMATED_AGE:
         if not text.isdigit():
             await update.message.reply_text(
@@ -304,61 +336,15 @@ async def handle_record_text(
         context.user_data["record_step"] = states.REPORTED_LOCATION
 
         await update.message.reply_text(
-            "👤 ¿Sabes el nombre de la persona?\n\n"
-            "Si lo sabes, escribe el nombre reportado.\n\n"
-            "Si no lo sabes, escribe:\n"
-            "Desconocido"
-        )
-        return
-
-    if step == states.REPORTED_NAME:
-    if len(text) > MAX_NAME_LENGTH:
-        await update.message.reply_text(
-            "⚠️ El nombre debe tener máximo 80 caracteres.\n\n"
-            "Intenta escribir una versión más corta."
-        )
-        return
-
-    context.user_data["reported_name"] = text
-
-    if subject_type == "animal":
-        context.user_data["record_step"] = states.REPORTED_LOCATION
-
-        await update.message.reply_text(
-            "📍 ¿Dónde se encuentra o fue visto el animal?\n\n"
-            "Puedes escribir ciudad, barrio, refugio, clínica veterinaria o punto de referencia.\n\n"
+            "📍 ¿En qué localización está esa persona?\n\n"
+            "Puedes escribir:\n"
+            "• Ciudad\n"
+            "• Barrio\n"
+            "• Hospital\n"
+            "• Refugio\n"
+            "• Punto de referencia\n\n"
             "Máximo 120 caracteres."
         )
-        return
-
-    context.user_data["record_step"] = states.ESTIMATED_AGE
-
-    await update.message.reply_text(
-        "🎂 ¿Cuál es la edad estimada de la persona?\n\n"
-        "Escribe solo números.\n\n"
-        "Ejemplo:\n"
-        "45"
-    )
-    return
-        context.user_data["record_step"] = states.REPORTED_LOCATION
-
-        if subject_type == "animal":
-            await update.message.reply_text(
-                "📍 ¿Dónde se encuentra o fue visto el animal?\n\n"
-                "Puedes escribir ciudad, barrio, refugio, clínica veterinaria o punto de referencia.\n\n"
-                "Máximo 120 caracteres."
-            )
-        else:
-            await update.message.reply_text(
-                "📍 ¿En qué localización está esa persona?\n\n"
-                "Puedes escribir:\n"
-                "• Ciudad\n"
-                "• Barrio\n"
-                "• Hospital\n"
-                "• Refugio\n"
-                "• Punto de referencia\n\n"
-                "Máximo 120 caracteres."
-            )
         return
 
     if step == states.REPORTED_LOCATION:
