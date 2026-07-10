@@ -15,6 +15,9 @@ REPORTED_LOCATION = "reported_location"
 SOURCE = "source"
 RECOGNITION_FEATURES = "recognition_features"
 
+# Optional public contact (introduced after recognition features)
+PUBLIC_CONTACT_TEXT = "public_contact_text"
+
 REVIEW = "review"
 SUBMIT = "submit"
 
@@ -35,7 +38,9 @@ ANIMAL_BREED_TEXT = "animal_breed_text"
 
 SEARCH_TYPE = "search_type"
 
+# ----------------------------------------------------------
 # Person search
+# ----------------------------------------------------------
 
 SEARCH_REPORTED_NAME = "search_reported_name"
 SEARCH_ESTIMATED_AGE = "search_estimated_age"
@@ -43,7 +48,9 @@ SEARCH_LOCATION = "search_location"
 SEARCH_SOURCE = "search_source"
 SEARCH_RECOGNITION_FEATURES = "search_recognition_features"
 
+# ----------------------------------------------------------
 # Animal search
+# ----------------------------------------------------------
 
 SEARCH_ANIMAL_SPECIES = "search_animal_species"
 SEARCH_ANIMAL_NAME = "search_animal_name"
