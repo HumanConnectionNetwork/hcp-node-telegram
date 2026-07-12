@@ -49,21 +49,24 @@ async def submit_record(
     # ---------------------------------------------------------
 
     await query.edit_message_text(
-        text=(
-            "✅ Reporte registrado correctamente.\n\n"
-            "Gracias por contribuir.\n\n"
-            "Tu observación humanitaria ha sido almacenada correctamente.\n\n"
-            "HCP no almacena identidades.\n"
-            "HCP almacena observaciones humanitarias estructuradas que pueden "
-            "relacionarse mediante procesos de correlación.\n\n"
-            "📄 Registro HCP\n\n"
-            f"ID:\n{record['id']}\n\n"
-            "Estado:\n"
-            "🟢 Registrado localmente\n\n"
-            "Este almacenamiento es temporal para pruebas locales.\n"
-            "En producción el registro será enviado automáticamente a un Nodo HCP."
-        )
+    text="✅ Reporte registrado correctamente."
+)
+
+await update.effective_chat.send_message(
+    text=(
+        "🆔 ID del reporte\n\n"
+        f"`{record['id']}`"
+    ),
+    parse_mode="Markdown"
+)
+
+await update.effective_chat.send_message(
+    text=(
+        "📌 Guarda este ID.\n\n"
+        "Con él podrás consultar nuevamente esta observación "
+        "y buscar reportes relacionados más recientes."
     )
+)
 
     # ---------------------------------------------------------
     # Clean conversation
