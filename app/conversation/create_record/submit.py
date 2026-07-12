@@ -11,10 +11,8 @@ async def submit_record(
     context: ContextTypes.DEFAULT_TYPE,
 ) -> None:
     """
-    Final confirmation step.
-
-    Builds a canonical HCP record and stores it locally.
-    Later this storage layer will be replaced by the HCP Node API.
+    Build a canonical HCP record, store it locally and show
+    the report ID in a mobile-friendly format.
     """
 
     query = update.callback_query
@@ -31,7 +29,7 @@ async def submit_record(
     record = build_hcp_record(context.user_data)
 
     # ---------------------------------------------------------
-    # Local persistence (development only)
+    # Local persistence
     # ---------------------------------------------------------
 
     add_record(record)
@@ -45,34 +43,38 @@ async def submit_record(
     context.user_data["record_step"] = states.SUBMIT
 
     # ---------------------------------------------------------
-    # Confirmation message
+    # Confirmation messages
     # ---------------------------------------------------------
 
     await query.edit_message_text(
-    text="✅ Reporte registrado correctamente."
-)
-
-language = context.user_data.get("language")
-
-context.user_data.clear()
-
-if language:
-    context.user_data["language"] = language
-
-context.user_data["last_record_id"] = record["id"]
-
-return await start_menu(update, context)
-
-await update.effective_chat.send_message(
-    text=(
-        "📌 Guarda este ID.\n\n"
-        "Con él podrás consultar nuevamente esta observación "
-        "y buscar reportes relacionados más recientes."
+        text="✅ Reporte registrado correctamente."
     )
-)
+
+    await update.effective_chat.send_message(
+        text=(
+            "🆔 ID del reporte\n\n"
+            f"<code>{record['id']}</code>"
+        ),
+        parse_mode="HTML",
+    )
+
+    await update.effective_chat.send_message(
+        text=(
+            "📌 Guarda este ID.\n\n"
+            "Con él podrás consultar nuevamente esta observación "
+            "y buscar reportes relacionados más recientes."
+        )
+    )
 
     # ---------------------------------------------------------
-    # Clean conversation
+    # Clean temporary conversation data
     # ---------------------------------------------------------
+
+    language = context.user_data.get("language")
 
     context.user_data.clear()
+
+    if language:
+        context.user_data["language"] = language
+
+    context.user_data["last_record_id"] = record["id"]
