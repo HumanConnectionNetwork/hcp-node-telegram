@@ -8,37 +8,47 @@ SOURCE_CLIENT = "hcp-client-telegram"
 
 
 HUMAN_EVENT_TYPES = {
-    "missing": "missing",
-    "hospitalized": "hospitalized",
-    "sheltered": "sheltered",
+    "missing": "missing_report",
+    "hospitalized": "hospital_admission",
+    "sheltered": "shelter_registration",
     "safe": "safe",
     "public_emergency": "public_emergency",
 }
 
 
 ANIMAL_EVENT_TYPES = {
-    "missing": "missing",
-    "found": "found",
+    "missing": "animal_missing",
+    "found": "animal_found",
 }
 
 
-REPORTED_BY_TYPES = {
+REPORTER_TYPES = {
     "family": "family",
     "hospital": "hospital",
-    "firefighters": "firefighters",
+    "fire_department": "fire_department",
     "volunteer": "volunteer",
     "police": "police",
     "friend": "friend",
-    "known_person": "known_person",
     "unknown": "unknown",
+}
+
+
+EMPTY_OPTIONAL_VALUES = {
+    "",
+    "omitir",
+    "omit",
+    "ninguno",
+    "ninguna",
+    "none",
+    "null",
 }
 
 
 def _clean_text(value: object) -> str:
     """
-    Convert a value to a stripped string.
+    Convert an arbitrary value to stripped text.
 
-    Return an empty string when the value is missing.
+    An empty string is returned when the value is missing.
     """
     if value is None:
         return ""
@@ -48,22 +58,14 @@ def _clean_text(value: object) -> str:
 
 def _clean_optional_text(value: object) -> str | None:
     """
-    Clean an optional text field.
+    Normalize optional text.
 
-    Return None when no meaningful value is available.
+    Values representing omission are converted to None so they are not
+    included in the canonical Humanitarian Record.
     """
     text = _clean_text(value)
 
-    if not text:
-        return None
-
-    if text.lower() in {
-        "omitir",
-        "omit",
-        "ninguno",
-        "ninguna",
-        "none",
-    }:
+    if text.lower() in EMPTY_OPTIONAL_VALUES:
         return None
 
     return text
@@ -71,10 +73,14 @@ def _clean_optional_text(value: object) -> str | None:
 
 def _clean_age(value: object) -> int | None:
     """
-    Convert the estimated age to a non-negative integer.
+    Convert an estimated age to a non-negative integer.
 
-    Invalid or missing values are omitted.
+    Missing or invalid values are omitted. Zero is accepted because HCP allows
+    an estimated age greater than or equal to zero.
     """
+    if value is None:
+        return None
+
     try:
         age = int(value)
     except (TypeError, ValueError):
@@ -88,10 +94,39 @@ def _clean_age(value: object) -> int | None:
 
 def _now_iso() -> str:
     """
-    Return the current UTC timestamp in canonical RFC 3339 format.
+    Return the current UTC timestamp using the RFC 3339 Z suffix.
     """
     return (
         datetime.now(timezone.utc)
+        .isoformat()
+        .replace("+00:00", "Z")
+    )
+
+
+def _normalize_timestamp(value: object) -> str:
+    """
+    Normalize an optional timestamp to an RFC 3339-compatible UTC value.
+
+    Telegram currently creates observations at submission time. The function
+    also accepts an existing ISO 8601 timestamp for future compatibility.
+    """
+    text = _clean_text(value)
+
+    if not text:
+        return _now_iso()
+
+    try:
+        parsed = datetime.fromisoformat(
+            text.replace("Z", "+00:00")
+        )
+    except ValueError:
+        return _now_iso()
+
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+
+    return (
+        parsed.astimezone(timezone.utc)
         .isoformat()
         .replace("+00:00", "Z")
     )
@@ -114,7 +149,9 @@ def _normalize_event_type(
     event_type: object,
 ) -> str:
     """
-    Convert Telegram event callbacks into canonical HCP event tokens.
+    Convert Telegram callback values to canonical HCP Event Types.
+
+    Unknown valid values are preserved to support protocol extensibility.
     """
     event = _clean_text(event_type).lower()
 
@@ -126,20 +163,17 @@ def _normalize_event_type(
 
 def _normalize_reported_by(value: object) -> str:
     """
-    Normalize Telegram reporter values to canonical HCP tokens.
+    Normalize the Telegram reporter source to an HCP canonical token.
 
-    The fallback value keeps the record valid when a legacy or incomplete
-    conversation state does not contain a recognized reporter value.
+    The Observation model requires reported_by, so unknown or missing values
+    fall back to the canonical token "unknown".
     """
-    reported_by = _clean_text(value).lower()
+    reporter = _clean_text(value).lower()
 
-    if not reported_by:
+    if not reporter:
         return "unknown"
 
-    return REPORTED_BY_TYPES.get(
-        reported_by,
-        reported_by,
-    )
+    return REPORTER_TYPES.get(reporter, reporter)
 
 
 def _remove_none_values(
@@ -148,8 +182,8 @@ def _remove_none_values(
     """
     Remove optional fields whose value is None.
 
-    Empty required strings are preserved so validation problems remain
-    visible during development and testing.
+    Empty required fields are preserved so validation errors remain visible
+    instead of being silently hidden.
     """
     return {
         key: value
@@ -158,45 +192,106 @@ def _remove_none_values(
     }
 
 
-def _build_human_subject(
+def _build_subject(
+    user_data: dict[str, Any],
+    subject_type: str,
+) -> dict[str, Any]:
+    """
+    Build the canonical HCP Subject section.
+
+    Animal-specific properties are preserved as compatible extension fields
+    because HCP allows additional Subject properties.
+    """
+    subject: dict[str, Any] = {
+        "type": subject_type,
+        "reported_label": _clean_optional_text(
+            user_data.get("reported_name")
+        ),
+        "recognition_features": _clean_optional_text(
+            user_data.get("recognition_features")
+        ),
+    }
+
+    if subject_type == "human":
+        subject["estimated_age"] = _clean_age(
+            user_data.get("estimated_age")
+        )
+
+    if subject_type == "animal":
+        subject.update(
+            {
+                "species": _clean_optional_text(
+                    user_data.get("animal_species")
+                ),
+                "size": _clean_optional_text(
+                    user_data.get("animal_size")
+                ),
+                "breed": _clean_optional_text(
+                    user_data.get("animal_breed")
+                ),
+            }
+        )
+
+    return _remove_none_values(subject)
+
+
+def _build_observation(
+    user_data: dict[str, Any],
+    event_type: str,
+) -> dict[str, Any]:
+    """
+    Build the canonical HCP Observation section.
+    """
+    observation: dict[str, Any] = {
+        "event_type": event_type,
+        "reported_location": _clean_optional_text(
+            user_data.get("reported_location")
+        ),
+        "reported_by": _normalize_reported_by(
+            user_data.get("source")
+        ),
+        "observed_at": _normalize_timestamp(
+            user_data.get("observed_at")
+        ),
+        "public_contact": _clean_optional_text(
+            user_data.get("public_contact")
+        ),
+    }
+
+    return _remove_none_values(observation)
+
+
+def build_hcp_record(
     user_data: dict[str, Any],
 ) -> dict[str, Any]:
     """
-    Build the canonical Subject section for a human.
+    Build one canonical HCP Humanitarian Record from Telegram conversation data.
+
+    This function is the boundary between Telegram-specific conversation
+    state and the protocol representation exchanged with HCP Nodes.
+
+    Telegram callback names, temporary state values and presentation labels
+    must not leak beyond this function.
     """
-    return _remove_none_values(
-        {
-            "type": "human",
-            "reported_label": _clean_optional_text(
-                user_data.get("reported_name")
-            ),
-            "estimated_age": _clean_age(
-                user_data.get("estimated_age")
-            ),
-            "recognition_features": _clean_optional_text(
-                user_data.get("recognition_features")
-            ),
-        }
+    subject_type = _normalize_subject_type(
+        user_data.get("subject_type")
     )
 
+    event_type = _normalize_event_type(
+        subject_type=subject_type,
+        event_type=user_data.get("event_type"),
+    )
 
-def _build_animal_subject(
-    user_data: dict[str, Any],
-) -> dict[str, Any]:
-    """
-    Build the canonical Subject section for an animal.
-
-    Animal-specific properties are preserved as compatible HCP extension
-    fields supported by the reference implementation.
-    """
-    return _remove_none_values(
-        {
-            "type": "animal",
-            "reported_label": _clean_optional_text(
-                user_data.get("reported_name")
-            ),
-            "recognition_features": _clean_optional_text(
-                user_data.get("recognition_features")
-            ),
-            "species": _clean_optional_text(
-                user_data.get("
+    return {
+        "id": str(uuid4()),
+        "schema_version": SCHEMA_VERSION,
+        "source_client": SOURCE_CLIENT,
+        "subject": _build_subject(
+            user_data=user_data,
+            subject_type=subject_type,
+        ),
+        "observation": _build_observation(
+            user_data=user_data,
+            event_type=event_type,
+        ),
+    }
